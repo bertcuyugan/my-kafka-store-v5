@@ -1,8 +1,19 @@
+# Secrets
 .env
-__pycache__/
-*.pyc
-.venv/
-.idea/
-data-lake/
+*.pem
+.databrickscfg
 *.md
 !README.md
+
+# Python / IDE
+.venv/
+__pycache__/
+*.pyc
+.idea/
+
+
+# Local data files
+*.parquet
+data/
+lake_output/
+data-lake/
