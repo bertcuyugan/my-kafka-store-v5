@@ -1,0 +1,28 @@
+version: 2
+
+sources:
+  - name: bronze
+    description: "Raw Kafka events loaded by Auto Loader (notebook 01_bronze_autoloader, Path B)."
+    database: workspace
+    schema: kafka_store_v5
+    config:
+      loaded_at_field: _loaded_at
+      freshness:
+        warn_after: {count: 24, period: hour}
+    tables:
+      - name: bronze_order_placed
+        description: "One row per order-placed event. event_data holds the JSON payload."
+        columns:
+          - name: event_id
+            description: "Unique id of the Kafka message (topic-partition-offset)."
+            data_tests:
+              - not_null
+              - unique:
+                  config:
+                    severity: warn
+      - name: bronze_payment_received
+        description: "One row per payment-received event."
+      - name: bronze_item_shipped
+        description: "One row per item-shipped event."
+      - name: bronze_item_delivered
+        description: "One row per item-delivered event."

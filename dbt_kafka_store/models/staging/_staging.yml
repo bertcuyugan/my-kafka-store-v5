@@ -1,0 +1,53 @@
+version: 2
+
+models:
+  - name: stg_orders
+    description: "Parsed order-placed events, one row per order."
+    columns:
+      - name: order_number
+        description: "Business key of the order, e.g. ORD-A1B2C3D4."
+        data_tests: [unique, not_null]
+      - name: customer_email
+        data_tests: [not_null]
+      - name: quantity
+        data_tests: [not_null]
+      - name: total_price
+        data_tests: [not_null]
+
+  - name: stg_payments
+    description: "Parsed payment-received events, one row per order."
+    columns:
+      - name: order_number
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_orders')
+                field: order_number
+
+  - name: stg_shipments
+    description: "Parsed item-shipped events, one row per order."
+    columns:
+      - name: order_number
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_orders')
+                field: order_number
+      - name: tracking_number
+        data_tests: [not_null]
+
+  - name: stg_deliveries
+    description: "Parsed item-delivered events, one row per order."
+    columns:
+      - name: order_number
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_shipments')
+                field: order_number
