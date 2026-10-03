@@ -17,3 +17,10 @@ __pycache__/
 data/
 lake_output/
 data-lake/
+
+
+# dbt
+dbt_kafka_store/target/
+dbt_kafka_store/dbt_packages/
+dbt_kafka_store/logs/
+logs/
