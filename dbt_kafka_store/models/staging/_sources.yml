@@ -10,16 +10,29 @@ sources:
       freshness:
         warn_after: {count: 24, period: hour}
     tables:
+      #- name: bronze_order_placed
+      #  description: "One row per order-placed event. event_data holds the JSON payload."
+      #  columns:
+      #    - name: event_id
+      #      description: "Unique id of the Kafka message (topic-partition-offset)."
+      #      data_tests:
+      #        - not_null
+      #        - unique:
+      #            config:
+      #              severity: warn
       - name: bronze_order_placed
         description: "One row per order-placed event. event_data holds the JSON payload."
+        data_tests:
+          - unique:
+              arguments:
+                column_name: "concat_ws('-', event_id, cast(kafka_timestamp_ms as string))"
+              config:
+                severity: warn
         columns:
           - name: event_id
-            description: "Unique id of the Kafka message (topic-partition-offset)."
+            description: "Kafka position (topic-partition-offset). Can repeat if Kafka is recreated."
             data_tests:
               - not_null
-              - unique:
-                  config:
-                    severity: warn
       - name: bronze_payment_received
         description: "One row per payment-received event."
       - name: bronze_item_shipped
