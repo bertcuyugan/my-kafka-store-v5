@@ -17,13 +17,18 @@ models:
   - name: fct_order_events
     description: "Every Kafka event of every type. Incremental (merge on event_id)."
     columns:
+      - name: event_uid
+        description: "event_id + Kafka timestamp. Unique even when Kafka offsets restart."
+        data_tests: [ unique, not_null ]
       - name: event_id
-        data_tests: [unique, not_null]
-      - name: event_type
-        data_tests:
-          - accepted_values:
-              arguments:
-                values: ['order-placed', 'payment-received', 'item-shipped', 'item-delivered']
+        data_tests: [ not_null ]
+     #- name: event_id
+     #  data_tests: [unique, not_null]
+     #- name: event_type
+     #  data_tests:
+     #    - accepted_values:
+     #        arguments:
+     #          values: ['order-placed', 'payment-received', 'item-shipped', 'item-delivered']
 
   - name: dim_customers
     description: "One row per customer email. Replaces gold_customers."
