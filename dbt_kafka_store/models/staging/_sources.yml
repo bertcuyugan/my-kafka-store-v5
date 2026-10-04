@@ -33,9 +33,33 @@ sources:
             description: "Kafka position (topic-partition-offset). Can repeat if Kafka is recreated."
             data_tests:
               - not_null
+      #- name: bronze_payment_received
+      #  description: "One row per payment-received event."
+      #- name: bronze_item_shipped
+      #  description: "One row per item-shipped event."
+      #- name: bronze_item_delivered
+      #  description: "One row per item-delivered event."
       - name: bronze_payment_received
         description: "One row per payment-received event."
+        data_tests:
+          - unique:
+              arguments:
+                column_name: "concat_ws('-', event_id, cast(kafka_timestamp_ms as string))"
+              config:
+                severity: warn
       - name: bronze_item_shipped
         description: "One row per item-shipped event."
+        data_tests:
+          - unique:
+              arguments:
+                column_name: "concat_ws('-', event_id, cast(kafka_timestamp_ms as string))"
+              config:
+                severity: warn
       - name: bronze_item_delivered
         description: "One row per item-delivered event."
+        data_tests:
+          - unique:
+              arguments:
+                column_name: "concat_ws('-', event_id, cast(kafka_timestamp_ms as string))"
+              config:
+                severity: warn
