@@ -1,0 +1,61 @@
+name: dbt deploy (production)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "dbt_kafka_store/**"
+      - "requirements-dbt.txt"
+      - "run_dbt.py"
+      - ".github/workflows/dbt-deploy.yml"
+  workflow_dispatch:        # adds a "Run workflow" button in the Actions tab
+
+# Never run two production deploys at the same time
+concurrency:
+  group: dbt-deploy-production
+  cancel-in-progress: false
+
+env:
+  DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+  DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+  DATABRICKS_HTTP_PATH: ${{ secrets.DATABRICKS_HTTP_PATH }}
+  DBT_CATALOG: workspace
+  DBT_SCHEMA: kafka_store_v5_dbt
+
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v6
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements-dbt.txt
+
+      - name: Install dbt
+        run: pip install -r requirements-dbt.txt python-dotenv==1.1.0
+
+      - name: Check the Databricks connection
+        run: python run_dbt.py debug
+
+      - name: Build and test production
+        run: python run_dbt.py build
+
+      - name: Generate dbt docs
+        run: python run_dbt.py docs generate
+
+      - name: Upload docs + manifest
+        uses: actions/upload-artifact@v6
+        with:
+          name: dbt-docs
+          path: |
+            dbt_kafka_store/target/index.html
+            dbt_kafka_store/target/manifest.json
+            dbt_kafka_store/target/catalog.json          retention-days: 30
