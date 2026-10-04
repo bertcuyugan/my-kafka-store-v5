@@ -35,13 +35,14 @@ models:
     columns:
       - name: customer_email
         data_tests: [unique, not_null]
-
+      - name: max_order_value
+        description: "Largest single order total for this customer."
+        data_tests: [ not_null ]
   - name: agg_daily_revenue
     description: "Orders, units and revenue per day. Replaces gold_daily_revenue."
     columns:
       - name: order_date
         data_tests: [unique, not_null]
-
   - name: agg_top_products
     description: "Sales per product. Replaces gold_top_products."
     columns:
