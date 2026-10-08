@@ -1,3 +1,19 @@
+## What's new in V5.3 — ETL → ELT
+- **Two raw sources, one transformation layer:** Kafka events *and* PostgreSQL tables are loaded
+  unchanged into Delta Bronze (`bronze_*`, `bronze_db_*`); **dbt is the only place business logic lives**
+- `services/db_snapshot.py`: consistent (repeatable-read) snapshots of 5 tables → Parquet → Volume + Azure
+- Notebook `01b_bronze_db`: Auto Loader into append-only snapshot tables (full history)
+- New marts: `dim_products` (DB price/stock + event sales) and `rpt_order_reconciliation`
+  (PostgreSQL vs Kafka, order by order)
+- Retired the PySpark Silver/Gold notebooks; the job runs Bronze → dbt
+
+```
+Kafka ──► lake_writer ──┐                                   ┌─► bronze_*    ─┐
+                        ├─► lake_uploader ─► Volume/ADLS ───┤                ├─► dbt ─► stg ─► fct/dim/agg/rpt
+PostgreSQL ► db_snapshot┘                                   └─► bronze_db_* ─┘
+```
+
+
 ## What's new in V5.2 — CI/CD for dbt
 - **dbt CI** (`.github/workflows/dbt-ci.yml`): every PR builds and tests only the changed models
   (`state:modified+ --defer`) in a temporary schema `ci_pr_<N>`; schemas are dropped when the PR closes
