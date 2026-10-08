@@ -1,0 +1,22 @@
+version: 2
+
+sources:
+  - name: postgres
+    description: "Raw PostgreSQL snapshots written by services/db_snapshot.py and loaded unchanged by notebook 01b_bronze_db."
+    database: workspace
+    schema: kafka_store_v5
+    config:
+      loaded_at_field: _loaded_at
+      freshness:
+        warn_after: {count: 24, period: hour}
+    tables:
+      - name: bronze_db_users
+        description: "Snapshots of the users table (password_hash is never extracted)."
+      - name: bronze_db_products
+        description: "Snapshots of the products table."
+      - name: bronze_db_orders
+        description: "Snapshots of the orders table."
+      - name: bronze_db_payments
+        description: "Snapshots of the payments table."
+      - name: bronze_db_shipments
+        description: "Snapshots of the shipments table."

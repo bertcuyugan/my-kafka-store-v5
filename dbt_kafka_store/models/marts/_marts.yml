@@ -50,3 +50,23 @@ models:
 
   - name: agg_fulfilment_kpis
     description: "Single-row fulfilment KPIs. Replaces gold_fulfilment_kpis."
+
+  - name: dim_products
+    description: "One row per product: PostgreSQL catalogue (price, stock) + sales from Kafka events."
+    columns:
+      - name: product_id
+        data_tests: [ unique, not_null ]
+      - name: units_sold
+        data_tests: [ not_null ]
+
+  - name: rpt_order_reconciliation
+    description: "Order-by-order comparison of PostgreSQL vs Kafka events."
+    columns:
+      - name: order_number
+        data_tests: [ unique, not_null ]
+      - name: reconciliation_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [ 'ok', 'missing_in_events', 'missing_in_db', 'status_mismatch', 'amount_mismatch' ]
+
